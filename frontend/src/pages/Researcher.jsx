@@ -222,9 +222,9 @@ const rejectReq = async (request) => {
     console.log(request.token);
     let token = request.token;
     // console.warn(cid);
-    let res = await contract.getNFT(token);
-    let cid = res[0];
-    console.warn(res);
+    await contract._checkLicense(token);
+    let cid = await contract.getNFT(token);
+    console.warn(cid);
     if (cid != "") {
       try {
         const response = await fetch("http://localhost:8000/api/nft/download", {
@@ -299,7 +299,7 @@ const rejectReq = async (request) => {
           className="flex justify-center bg-primary fixed top-0 left-0 w-full h-screen z-20 duration-700"
           onClick={() => setVeiw(false)}
         >
-          <RecordViewer base64String={fileString} />
+          <RecordViewer pdfUrl={fileString} />
         </div>
       )}
     </div>

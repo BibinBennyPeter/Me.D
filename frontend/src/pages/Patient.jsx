@@ -410,7 +410,7 @@ const Patient = (props) => {
           className="flex justify-center bg-primary/60 fixed top-0 left-0 w-full h-screen z-20 duration-700"
           onClick={() => setVeiw(false)}
         >
-          <RecordViewer base64String={fileString} />
+          <RecordViewer pdfUrl={fileString} />
         </div>
       )}
       {Pop && <PopUp handleSubmit={detailsSubmit} />}
