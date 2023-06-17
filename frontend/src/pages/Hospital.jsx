@@ -22,6 +22,9 @@ const Hospital = () => {
   // const [patAdd, setPatAdd] = useState("");
   const [DiaCode, setDiaCode] = useState("");
   const [fileBase64String, setFileBase64String] = useState("");
+  const [Record, setRecord] = useState();
+  const [Submitting, setSubmitting] = useState(false);
+  const [Minting, setMinting] = useState(false);
   let cid = "";
 
   const [Meta, setMeta] = useState(false);
@@ -90,8 +93,11 @@ const Hospital = () => {
 
   const reqApproval = async (e, Pid, Doc, DiaCode) => {
     console.log(Meta);
+
     if (Meta) {
       e.preventDefault();
+      // setRqstd(false);
+      setSubmitting(true);
 
       // request_to = e.target.UserID.value;
       // Content = e.target.Content.value;
@@ -120,10 +126,19 @@ const Hospital = () => {
           console.log(typeof patAdd);
           try {
             await contract.setOwnersAndRequestApproval(hosAdd, patAdd);
+            // setRqstd(true);
+            setSubmitting(false);
             toast.success(`Request sent to ${Pid}`);
           } catch (error) {
             console.log(error);
-            toast.error(error.data.message);
+            setSubmitting(false);
+            if (error.message.includes("user rejected transaction")) {
+              toast.error("Transaction rejected");
+            } else {
+              toast.error(error.data.message);
+            }
+
+            // setRqstd(true);
           }
         } else {
           throw new Error("Request failed with status: " + response.status);
@@ -138,6 +153,9 @@ const Hospital = () => {
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files);
+    if (e.target.files) {
+      setRecord(true);
+    }
     console.log(e.target.files[0]);
   };
   const encodeFileBase64 = (file) => {
@@ -159,52 +177,59 @@ const Hospital = () => {
   }, [selectedFile]);
   const handleMintUpload = async (e) => {
     e.preventDefault();
-    console.log(fileBase64String);
-    const utf8Encoder = new TextEncoder();
-    const tokenId = ethers.utils.keccak256(
-      utf8Encoder.encode(fileBase64String)
-    );
-    console.log(typeof tokenId);
+    console.log(Record);
+    if (Record) {
+      // setRecord(false);
+      setMinting(true);
+      console.log(fileBase64String);
+      const utf8Encoder = new TextEncoder();
+      const tokenId = ethers.utils.keccak256(
+        utf8Encoder.encode(fileBase64String)
+      );
+      console.log(typeof tokenId);
 
-    console.log(DiaCode);
-    console.log(Doc);
-    console.log(Pid);
-    console.log(DiaCode);
-    console.log(fileBase64String);
+      console.log(DiaCode);
+      console.log(Doc);
+      console.log(Pid);
+      console.log(DiaCode);
+      console.log(fileBase64String);
 
-    const response = await fetch("http://localhost:8000/api/nft/upload", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${tk}`,
-      },
-      body: JSON.stringify({
-        token_id: String(tokenId),
-        patient_username: Pid,
-        hash: fileBase64String,
-        diagnosis_code: DiaCode,
-        doc_name: Doc,
-      }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      console.log(tokenId);
-      console.log(data.cid);
-      cid = data.cid;
-      const amt = ethers.utils.parseEther("0.01");
-      try {
-        await contract.mintNFT(tokenId, data.cid, { value: amt });
-        toast("\tNFT Minted");
-        NftMinted();
-      } catch (error) {
-        toast.error(error);
+      const response = await fetch("http://localhost:8000/api/nft/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tk}`,
+        },
+        body: JSON.stringify({
+          token_id: String(tokenId),
+          patient_username: Pid,
+          hash: fileBase64String,
+          diagnosis_code: DiaCode,
+          doc_name: Doc,
+        }),
+      });
+      setMinting(false);
+      if (response.ok) {
+        const data = await response.json();
+        console.log(tokenId);
+        console.log(data.cid);
+        cid = data.cid;
+        const amt = ethers.utils.parseEther("0.01");
+        try {
+          await contract.mintNFT(tokenId, data.cid, { value: amt });
+          toast("\tNFT Minted");
+          NftMinted();
+          setRecord(false);
+        } catch (error) {
+          toast.error(error);
+        }
+        // const r = contract.getReceivedValue();
+        // console.log(r);
+        setPop(!pop);
+        console.log(data);
+      } else {
+        throw new Error("Request failed with status: " + response.status);
       }
-      // const r = contract.getReceivedValue();
-      // console.log(r);
-      setPop(!pop);
-      console.log(data);
-    } else {
-      throw new Error("Request failed with status: " + response.status);
     }
   };
 
@@ -276,7 +301,7 @@ const Hospital = () => {
         {currentTab === "Home" ? (
           <>
             <div className="flex justify-center items-center h-screen">
-              <Mint handleSubmit={reqApproval} />
+              <Mint handleSubmit={reqApproval} Submitting={Submitting} />
             </div>
           </>
         ) : (
@@ -289,12 +314,22 @@ const Hospital = () => {
       </div>
       <div className="flex justify-center items-center">{/* <div> */}</div>
       {pop && (
-        <div className=" absolute justify-center items-center bg-primary/90  top-0 left-0 w-full h-screen z-20">
+        <div className=" absolute justify-center items-center bg-primary/90  top-0 left-0 w-full h-screen z-20 overflow-hidden">
           <div className="flex justify-center items-center w-screen h-screen">
             <form
-              className="flex flex-col bg-primary justify-center items-center w-[390px] h-[200px] border-2 border-green-400 rounded-xl text-green-300"
+              className={`relative flex flex-col bg-primary justify-center items-center w-[390px] h-[200px] border-2 first-letter
+              ${Minting ? " border-transparent" : "border-green-400"} 
+               rounded-xl text-green-300 overflow-hidden`}
               onSubmit={handleMintUpload}
             >
+              {Minting && (
+                <>
+                  <span className="absolute top-0 w-full h-0.5 bg-gradient-to-r from-violet-500 to-blue-500 animate-lineR bg-transparent "></span>
+                  <span className="absolute  right-0 h-full w-0.5 bg-gradient-to-b from-violet-500 to-blue-500 animate-lineB bg-transparent [animation-delay:375ms]"></span>
+                  <span className="absolute bottom-0 w-full h-0.5 bg-gradient-to-l from-violet-500 to-blue-500 animate-lineL bg-transparent [animation-delay:775ms]"></span>
+                  <span className="absolute  left-0 h-full w-0.5 bg-gradient-to-t from-violet-500 to-blue-500 animate-lineT bg-transparent [animation-delay:1250ms]"></span>
+                </>
+              )}
               <label className=" inline-block">
                 Upload medical record to be minted as Nft
               </label>
@@ -304,8 +339,11 @@ const Hospital = () => {
                 onChange={handleFileChange}
               />
               <button
+                disabled={Minting}
                 type="submit"
-                className="bg-green-400 text-white hover:bg-violet-600 hover:brightness-125 duration-200"
+                className={`bg-green-400 text-white hover:bg-violet-600 hover:brightness-125 duration-200 ${
+                  Minting ? "brightness-50" : ""
+                }`}
               >
                 Mint
               </button>

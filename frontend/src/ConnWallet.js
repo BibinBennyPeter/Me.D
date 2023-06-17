@@ -11,7 +11,7 @@ const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 
 // initialize contract
-const contractAddress = "0xF4514e5839b9FA297A4a67c3F4e0EEc9B4e0Aa89";
+const contractAddress = "0x71a357e0dD24c2F7bdd08a742Ba1aaDA6Ce8B1D2";
 const contract = new ethers.Contract(contractAddress, recordNft_abi, signer);
 
 export { provider, signer, contract };

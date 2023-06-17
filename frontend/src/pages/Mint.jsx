@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const Mint = ({ handleSubmit }) => {
+const Mint = ({ handleSubmit, Submitting }) => {
   // const location = useLocation();
 
   const [Pid, setPid] = useState("");
   const [Doc, setDoc] = useState("");
   const [DiaCode, setDiaCode] = useState("");
   const [Error, setError] = useState(false);
+  // const [Submitting, setSubmitting] = useState(false);
   const suggestions = ["Apple", "Apricot"];
   const tk = sessionStorage.getItem("tk");
 
@@ -62,10 +63,13 @@ const Mint = ({ handleSubmit }) => {
           )}
         </div>
         <button
+          disabled={Submitting}
           type="submit"
-          className="bg-green-700/40 border-none w-2/3 mx-3 hover:brightness-150 duration-500"
+          className={`bg-green-700/40 border-none w-2/3 mx-3 hover:brightness-150 duration-500 ${
+            Submitting ? "animate-pulse brightness-50" : ""
+          }`}
         >
-          Submit
+          {Submitting ? "Submitting..." : "Submit"}
         </button>
         <button
           type="reset"

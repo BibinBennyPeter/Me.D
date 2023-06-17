@@ -6,6 +6,7 @@ import RequestContainer from "../components/RequestContainer";
 import PopUp from "../components/PopUp";
 import { contract } from "../ConnWallet";
 import RecordViewer from "../components/RecordViewer";
+import { ethers } from "ethers";
 
 const Researcher = () => {
   const [currentTab, setCurrentTab] = useState("history");
@@ -172,7 +173,10 @@ const rejectReq = async (request) => {
     console.log(Meta);
     if (Meta) {
       try {
-        await contract.requestApprovalForLicense(token, 72);
+        const cost = time * 0.01;
+        console.log(cost);
+        const amt = ethers.utils.parseEther(String(cost));
+        await contract.requestApprovalForLicense(token, time, { value: amt });
         let content = `License`;
         9;
         console.log(pid);
