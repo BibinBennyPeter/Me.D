@@ -7,6 +7,7 @@ import PopUp from "../components/PopUp";
 import { contract } from "../ConnWallet";
 import RecordViewer from "../components/RecordViewer";
 import { ethers } from "ethers";
+import { toast } from "react-toastify";
 
 const Researcher = () => {
   const [currentTab, setCurrentTab] = useState("history");
@@ -227,32 +228,43 @@ const rejectReq = async (request) => {
     let token = request.token;
     // console.warn(cid);
     await contract._checkLicense(token);
-    let cid = await contract.getNFT(token);
-    console.warn(cid);
-    if (cid != "") {
-      try {
-        const response = await fetch("http://localhost:8000/api/nft/download", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tk}`,
-          },
-          body: JSON.stringify({ cid }),
-        });
+    try {
+      let cid = await contract.getNFT(token);
+      console.warn(cid);
+      if (cid != "") {
+        try {
+          const response = await fetch(
+            "http://localhost:8000/api/nft/download",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tk}`,
+              },
+              body: JSON.stringify({ cid }),
+            }
+          );
 
-        if (response.ok) {
-          const pdf = await response.blob();
+          if (response.ok) {
+            const pdf = await response.blob();
 
-          setFileString(URL.createObjectURL(pdf));
-        } else {
+            setFileString(URL.createObjectURL(pdf));
+          } else {
+            setFileString("");
+            throw new Error("Request failed with status: " + response.status);
+          }
+        } catch (error) {
+          console.log("Error: " + error.message);
           setFileString("");
-          throw new Error("Request failed with status: " + response.status);
         }
-      } catch (error) {
-        console.log("Error: " + error.message);
-        setFileString("");
+        setVeiw(true);
       }
-      setVeiw(true);
+    } catch (error) {
+      if (error.message.includes("expired")) {
+        toast.error("License Expired");
+      } else {
+        toast.error(error.data.message);
+      }
     }
   };
 
@@ -304,6 +316,7 @@ const rejectReq = async (request) => {
           onClick={() => setVeiw(false)}
         >
           <RecordViewer pdfUrl={fileString} />
+          <div className="absolute bg-primary top-0 left-0 z-20 w-full h-18"></div>
         </div>
       )}
     </div>

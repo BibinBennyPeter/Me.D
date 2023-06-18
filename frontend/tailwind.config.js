@@ -20,7 +20,7 @@ export default {
         },
         lineR: {
           "0%": { transform: "translateX(-100%)" },
-          "50%, 100%": { transform: " translateX(100%)" },
+          "50%, 100%": { transform: " translateX(140%)" },
         },
         lineL: {
           "0%": { transform: "translateX(100%)" },
@@ -28,7 +28,7 @@ export default {
         },
         lineB: {
           "0%": { transform: "translateY(-100%)" },
-          "50%, 100%": { transform: " translateY(100%)" },
+          "50%, 100%": { transform: " translateY(120%)" },
         },
         lineT: {
           "0%": { transform: "translateY(100%)" },

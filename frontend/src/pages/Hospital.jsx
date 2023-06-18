@@ -193,42 +193,47 @@ const Hospital = () => {
       console.log(Pid);
       console.log(DiaCode);
       console.log(fileBase64String);
-
-      const response = await fetch("http://localhost:8000/api/nft/upload", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tk}`,
-        },
-        body: JSON.stringify({
-          token_id: String(tokenId),
-          patient_username: Pid,
-          hash: fileBase64String,
-          diagnosis_code: DiaCode,
-          doc_name: Doc,
-        }),
-      });
-      setMinting(false);
-      if (response.ok) {
-        const data = await response.json();
-        console.log(tokenId);
-        console.log(data.cid);
-        cid = data.cid;
-        const amt = ethers.utils.parseEther("0.01");
-        try {
-          await contract.mintNFT(tokenId, data.cid, { value: amt });
-          toast("\tNFT Minted");
-          NftMinted();
-          setRecord(false);
-        } catch (error) {
-          toast.error(error);
+      try {
+        const response = await fetch("http://localhost:8000/api/nft/upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${tk}`,
+          },
+          body: JSON.stringify({
+            token_id: String(tokenId),
+            patient_username: Pid,
+            hash: fileBase64String,
+            diagnosis_code: DiaCode,
+            doc_name: Doc,
+          }),
+        });
+        setMinting(false);
+        if (response.ok) {
+          const data = await response.json();
+          console.log(tokenId);
+          console.log(data.cid);
+          cid = data.cid;
+          const amt = ethers.utils.parseEther("0.01");
+          try {
+            await contract.mintNFT(tokenId, data.cid, { value: amt });
+            toast("\tNFT Minted");
+            NftMinted();
+            setRecord(false);
+          } catch (error) {
+            toast.error(error);
+          }
+          // const r = contract.getReceivedValue();
+          // console.log(r);
+          setPop(!pop);
+          console.log(data);
+        } else {
+          toast.error("Process failed : Try again");
+          throw new Error("Request failed with status: " + response.status);
         }
-        // const r = contract.getReceivedValue();
-        // console.log(r);
-        setPop(!pop);
-        console.log(data);
-      } else {
-        throw new Error("Request failed with status: " + response.status);
+      } catch (error) {
+        console.log(error);
+        toast.error();
       }
     }
   };
@@ -318,16 +323,20 @@ const Hospital = () => {
           <div className="flex justify-center items-center w-screen h-screen">
             <form
               className={`relative flex flex-col bg-primary justify-center items-center w-[390px] h-[200px] border-2 first-letter
-              ${Minting ? " border-transparent" : "border-green-400"} 
+              ${
+                Minting
+                  ? " border-transparent brightness-75 animate-pulse"
+                  : "border-green-400"
+              } 
                rounded-xl text-green-300 overflow-hidden`}
               onSubmit={handleMintUpload}
             >
               {Minting && (
                 <>
-                  <span className="absolute top-0 w-full h-0.5 bg-gradient-to-r from-violet-500 to-blue-500 animate-lineR bg-transparent "></span>
-                  <span className="absolute  right-0 h-full w-0.5 bg-gradient-to-b from-violet-500 to-blue-500 animate-lineB bg-transparent [animation-delay:375ms]"></span>
-                  <span className="absolute bottom-0 w-full h-0.5 bg-gradient-to-l from-violet-500 to-blue-500 animate-lineL bg-transparent [animation-delay:775ms]"></span>
-                  <span className="absolute  left-0 h-full w-0.5 bg-gradient-to-t from-violet-500 to-blue-500 animate-lineT bg-transparent [animation-delay:1250ms]"></span>
+                  <span className="absolute top-0 w-full h-1 bg-gradient-to-r from-violet-500 to-blue-500 animate-lineR bg-transparent "></span>
+                  <span className="absolute  right-0 h-full w-1 bg-gradient-to-b from-violet-500 to-blue-500 animate-lineB bg-transparent [animation-delay:475ms]"></span>
+                  <span className="absolute bottom-0 w-full h-1 bg-gradient-to-l from-violet-500 to-blue-500 animate-lineL bg-transparent [animation-delay:900ms]"></span>
+                  <span className="absolute  left-0 h-full w-1 bg-gradient-to-t from-violet-500 to-blue-500 animate-lineT bg-transparent [animation-delay:1250ms]"></span>
                 </>
               )}
               <label className=" inline-block">
