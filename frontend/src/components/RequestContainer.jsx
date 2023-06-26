@@ -74,8 +74,8 @@ const RequestContainer = (props) => {
 
           {ResMsg && (
             <span>
-              {request.sender_username} has licensed you medical records on
-              Fracture
+              {request.sender_username} has licensed you medical records on{" "}
+              {request.diagnosis_disease}
             </span>
           )}
           {aBtn && (
