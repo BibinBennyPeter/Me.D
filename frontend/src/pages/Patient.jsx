@@ -147,39 +147,39 @@ const Patient = (props) => {
 
   const acceptLicReq = async (request) => {
     if (Meta) {
+      // sm = await contract.approve();
+      console.warn(request.researcher_address);
       try {
-        // sm = await contract.approve();
-        console.log(request.researcher_address);
-        try {
-          await contract.respondToLicenseRequest(
-            ethers.utils.getAddress(request.researcher_address),
-            true
-          );
-        } catch (error) {
-          toast.error(error.message);
-        }
-        const response = await fetch(
-          "http://localhost:8000/api/request/license/check/accept",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${tk}`,
-            },
-            body: JSON.stringify({ reqId: request._id }),
-          }
+        await contract.respondToLicenseRequest(
+          ethers.utils.getAddress(request.researcher_address),
+          true
         );
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setCnt(!cnt);
-          // console.log(cnt);
-        } else {
-          throw new Error("Request failed with status: " + response.status);
+        try {
+          const response = await fetch(
+            "http://localhost:8000/api/request/license/check/accept",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tk}`,
+              },
+              body: JSON.stringify({ reqId: request._id }),
+            }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            console.log(data);
+            setCnt(!cnt);
+            // console.log(cnt);
+          } else {
+            throw new Error("Request failed with status: " + response.status);
+          }
+        } catch (error) {
+          console.log(error);
+          //set popup
         }
       } catch (error) {
-        console.log(error);
-        //set popup
+        toast.error(error.message);
       }
     } else toast.info("Connect your wallet");
   };

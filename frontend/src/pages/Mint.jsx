@@ -42,7 +42,7 @@ const Mint = ({ handleSubmit, Submitting }) => {
           </datalist> */}
 
         <InputBox
-          label="Docter's Name"
+          label="Doctor's Name"
           value={Doc}
           onChange={(event) => {
             setDoc(event.target.value);

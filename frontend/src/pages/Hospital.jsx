@@ -21,6 +21,7 @@ const Hospital = () => {
   const [RequestId, setRequestId] = useState("");
   // const [patAdd, setPatAdd] = useState("");
   const [DiaCode, setDiaCode] = useState("");
+  const [id, setId] = useState("");
   const [fileBase64String, setFileBase64String] = useState("");
   const [Record, setRecord] = useState();
   const [Submitting, setSubmitting] = useState(false);
@@ -211,8 +212,9 @@ const Hospital = () => {
         setMinting(false);
         if (response.ok) {
           const data = await response.json();
-          console.log(tokenId);
+          console.log(data);
           console.log(data.cid);
+          setId(data.id);
           cid = data.cid;
           const amt = ethers.utils.parseEther("0.01");
           try {
@@ -253,6 +255,7 @@ const Hospital = () => {
             mint: true,
             cid,
             reqId: RequestId,
+            id,
           }),
         }
       );

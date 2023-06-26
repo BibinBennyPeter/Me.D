@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { provider, signer, contract } from "../ConnWallet";
 import { ethers } from "ethers";
+import { toast } from "react-toastify";
 const ConnButton = ({ handleConnect }) => {
   const [ConBtn, setConBtn] = useState("Connect Wallet");
   const [Connection, setConnection] = useState(false);
@@ -43,12 +44,13 @@ const ConnButton = ({ handleConnect }) => {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
         setConnection(true);
         if (data.anotherAccount) {
+          toast.error("Connect your primary account");
         }
       } else {
         throw new Error("Request failed with status: " + response.status);
-        setConnection(false);
       }
     }
   };
