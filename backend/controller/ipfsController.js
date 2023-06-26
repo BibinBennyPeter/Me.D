@@ -136,17 +136,17 @@ const download = asyncHandler(async (req, res) => {
 //@route           GET /api/nft/upload/mint
 //@access          Public
 const orgUpload = asyncHandler(async (req, res) => {
-  const { cid, mint, reqId } = req.body;
+  const { cid, mint, reqId ,id} = req.body;
   //console.log(cid)
   //const { reqId } = req.body;
   const change = await nftRequest.findByIdAndUpdate(reqId, {
     $set: { isSenderRead: true },
   });
-  const cidExists = await data.findOne({ cid: cid });
+  const cidExists = await data.findOne({ _id: id });
 
   if (cidExists == null) {
     res.status(400);
-    throw new Error("CID  match not found");
+    throw new Error("ID  match not found while uploading");
   }
   //console.log(cidExists)
 
