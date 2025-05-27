@@ -1,6 +1,6 @@
 # Me.D
 
-> ⚠️ **Note**: This project was developed as part of an academic endeavor and is no longer actively maintained. It may not function as intended with current technologies.
+> ⚠️ **Note**: This project was developed as part of an academic endeavor and is no longer actively maintained. It may not function as intended with current technologies.Please refer to the actively developed and upgraded version  [medical-data-management-dapp](https://github.com/BibinBennyPeter/medical-data-management-dapp/)
 
 **Me.D** is a decentralized application (dApp) built on the Ethereum blockchain that empowers patients with ownership of their medical records. Hospitals can mint records under the patient's identity, and researchers can license access to this data. The system ensures data privacy, security, and controlled access through smart contracts.
 
